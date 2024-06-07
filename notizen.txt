@@ -1,0 +1,72 @@
+1.Anzeigen der verbleibenden Zeit des Access Tokens
+
+function parseJwt(token) {
+    let base64Url = token.split('.')[1];
+    let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
+// Beispiel
+let token = 'deinAccessToken';
+let decodedToken = parseJwt(token);
+console.log(decodedToken.exp);  // Unix Timestamp
+
+2.Berechnen der verbleibenden Zeit
+Um die verbleibende Zeit zu berechnen, ziehst du die aktuelle Zeit von der Expirationszeit ab.
+
+let currentTime = Math.floor(Date.now() / 1000);  // In Sekunden
+let remainingTime = decodedToken.exp - currentTime;  // In Sekunden
+
+3. Implementieren eines Countdown-Timers
+Mit der verbleibenden Zeit kannst du einen Countdown-Timer implementieren und eine Snackbar oder eine Benachrichtigung anzeigen.
+
+let countdown = remainingTime;
+let interval = setInterval(() => {
+    if (countdown <= 0) {
+        clearInterval(interval);
+        // Zeige Snackbar oder Benachrichtigung an
+    } else {
+        countdown--;
+        // Aktualisiere die Anzeige des Timers
+        console.log(countdown);
+    }
+}, 1000);  // Alle 1 Sekunde
+
+4. Automatisches Auffrischen des Tokens
+Bevor der Token abläuft, kannst du automatisch einen Refresh ausführen und den neuen Token speichern.
+
+if (countdown <= 30) {  // 30 Sekunden vor Ablauf
+    fetch('http://127.0.0.1:8000/api/token/refresh/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ refresh: deinRefreshToken })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Speichere den neuen Access Token
+        localStorage.setItem('accessToken', data.access);
+        // Aktualisiere den Countdown mit dem neuen Token
+        decodedToken = parseJwt(data.access);
+        remainingTime = decodedToken.exp - Math.floor(Date.now() / 1000);
+        countdown = remainingTime;
+    });
+}
+
+
+Best Practices
+Automatische Token-Aktualisierung:
+
+Viele Anwendungen automatisieren den Prozess der Token-Aktualisierung im Hintergrund.
+Bevor der Token abläuft (z.B. 1 Minute vorher), wird der Token automatisch aufgefrischt.
+
+Fallback für abgelaufene Token:
+Falls der Token dennoch abläuft, sollte der Benutzer zur Login-Seite weitergeleitet werden, um sich neu anzumelden.
+
+Benutzerfreundliche Benachrichtigungen:
+Eine Snackbar oder ein Pop-up kann den Benutzer informieren, dass die Sitzung bald abläuft und eine Aktion erforderlich ist.
