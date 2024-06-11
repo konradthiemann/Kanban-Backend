@@ -1,38 +1,46 @@
 from rest_framework import serializers
-from .models import Todo
+from .models import Todo, Category
 from django.contrib.auth.models import User
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-
+# class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id',
-                  'first_name',
-                  'last_name',
-                  'username',
-                  'email'
-                  ]
+        fields = [
+            'id',
+            'first_name',
+            'last_name',
+            'username',
+            'email'
+        ]
 
-class TodoSerializer(serializers.HyperlinkedModelSerializer):
-
-    # assigned_to = serializers.PrimaryKeyRelatedField(
-    #     read_only=True,
-    #     default=serializers.CurrentUserDefault()
-    #     )
-    
-    # TODO: Erklärung für author = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
-    # author = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
-    author = UserSerializer(read_only=True)
-
+class TodoSerializer(serializers.ModelSerializer):
+    author = UserSerializer(
+        read_only=True
+    )
+    assigned_to = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        many=True,
+    )
+    due_date = serializers.IntegerField() 
     class Meta:
         model = Todo
-        fields = ['title',
-                #   'created_at',
-                #   'description',
-                #   'due_date',
-                #   'category',
-                #   'status',
-                #   'urgency',
-                #   'assigned_to',
-                  'author'
-                  ]
+        fields = [
+            'id',
+            'title',
+            'description',
+            'due_date',
+            'urgency',
+            'status',
+            'category',
+            'assigned_to',
+            'author'
+        ]
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = [
+            'id',
+            'name'
+        ]

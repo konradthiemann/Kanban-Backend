@@ -14,9 +14,9 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from todo.views import TodoViewSet
 from django.urls import path, include
 from django.contrib import admin
+from todo.views import TodoViewSet, CategoryViewSet, UserViewSet
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -25,10 +25,13 @@ from rest_framework_simplejwt.views import (
 
 router = DefaultRouter()
 router.register(r'todos', TodoViewSet)
+router.register(r'categories', CategoryViewSet)
+router.register(r'users', UserViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'), # POST JSON mit "username" & "password"
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), # POST JSON mit "refresh":"refreshToken"
     path('', include(router.urls)),
+    path('api/auth/', include('rest_framework.urls')), # For login/logout views
 ]

@@ -70,3 +70,147 @@ Falls der Token dennoch abläuft, sollte der Benutzer zur Login-Seite weitergele
 
 Benutzerfreundliche Benachrichtigungen:
 Eine Snackbar oder ein Pop-up kann den Benutzer informieren, dass die Sitzung bald abläuft und eine Aktion erforderlich ist.
+
+___________________________________________________________________________________________________________________________________________
+
+Ich hatte in meiner serializers.py eigentlich bei author das hier stehen:
+    author = UserSerializer(
+        read_only=True
+    )
+warum hast du das zu:
+    author = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
+geändert? Gibt es dafür einen bestimmten Grund und was unterscheidet die beiden Möglichkeiten?
+bei assigned_to hast du ebenfalls serializers.PrimaryKeyRelatedField benutzt. Könnte man das sonst auch zu UserSerializer ändern?    
+Wäre es nicht sinnig, wenn description ein eigenes Feld ist und nicht zu category gehört?
+sollte man nicht jedem Feld on_delete=model.CASCADE hinzufügen?
+Erkläre mir genauer was du in der views.py gemacht hast. Bisher sieht sie bei mir ja so aus:
+
+"imports"
+class TodoViewSet(viewsets.ModelViewSet):
+    queryset = Todo.objects.all().order_by('-id')
+    serializer_class = TodoSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = TodoFilter
+
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+        todo = Todo.objects.create(
+            title = self.request.POST.get('title', ''),
+            author = self.request.user,
+        )
+        serialized_obj = serializers.serialize('json', [todo])
+        return HttpResponse(serialized_obj, content_type='application/json')
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = CategoryFilter
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = UserFilter
+
+
+Außerdem gefällt mir nicht, dass du als Übergabewert für das due_date so eine Zeichenkette benutzt("due_date": "2024-06-05T12:00:00Z",).
+Kann man das nicht mit einem unix Timestamp umsetzen? ein date picker gibt doch auch nur den unix Timestamp zurück oder? Und dann braucht man das nur für das input feld umrechnen?
+
+
+___________________________________________________________________________________________________________________________________________
+
+
+## Schrittweise Implementierung im Frontend mit Postman
+
+1. **User List abrufen:**
+   - Methode: `GET`
+   - URL: `http://127.0.0.1:8000/api/users/`
+   - Header: `Authorization: Bearer <your_access_token>`
+
+2. **Task erstellen:**
+   - Methode: `POST`
+   - URL: `http://127.0.0.1:8000/api/todos/`
+   - Header: `Authorization: Bearer <your_access_token>`
+   - Body (JSON):
+     ```json
+     {
+       "title": "New Task",
+       "due_date": "1712345678",
+       "urgency": "urgent",
+       "status": "todo",
+       "category": 1,  // Assuming a category with ID 1 exists
+       "assigned_to": [1, 2]  // User IDs
+     }
+     ```
+
+3. **Token Refresh in Postman:**
+   - Methode: `POST`
+   - URL: `http://127.0.0.1:8000/api/token/refresh/`
+   - Body (JSON):
+     ```json
+     {
+       "refresh": "<your_refresh_token>"
+     }
+     ```
+
+### Verbleibende Zeit der Gültigkeit des Access Tokens anzeigen
+
+```javascript
+// Beispiel-Implementierung im Frontend
+
+function parseJwt(token) {
+    let base64Url = token.split('.')[1];
+    let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
+let token = localStorage.getItem('accessToken');
+let decodedToken = parseJwt(token);
+let expirationTime = decodedToken.exp;
+let currentTime = Math.floor(Date.now() / 1000);  // In Sekunden
+let remainingTime = expirationTime - currentTime;  // In Sekunden
+
+function updateTimer() {
+    let countdownElement = document.getElementById('countdown');
+    if (remainingTime > 0) {
+        countdownElement.innerText = `Verbleibende Zeit: ${remainingTime} Sekunden`;
+        remainingTime--;
+    } else {
+        countdownElement.innerText = `Token abgelaufen! Bitte erneuern.`;
+        clearInterval(timer);
+    }
+}
+
+let timer = setInterval(updateTimer, 1000);  // Alle 1 Sekunde
+
+Automatisches Auffrischen des Tokens
+
+function refreshToken() {
+    fetch('http://127.0.0.1:8000/api/token/refresh/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ refresh: localStorage.getItem('refreshToken') })
+    })
+    .then(response => response.json())
+    .then(data => {
+        localStorage.setItem('accessToken', data.access);
+        decodedToken = parseJwt(data.access);
+        expirationTime = decodedToken.exp;
+        currentTime = Math.floor(Date.now() / 1000);
+        remainingTime = expirationTime - currentTime;
+    });
+}
+
+// Beispiel-Aufruf 30 Sekunden vor Ablauf des Tokens
+setTimeout(refreshToken, (remainingTime - 30) * 1000);
