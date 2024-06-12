@@ -214,3 +214,67 @@ function refreshToken() {
 
 // Beispiel-Aufruf 30 Sekunden vor Ablauf des Tokens
 setTimeout(refreshToken, (remainingTime - 30) * 1000);
+
+___________________________________________________________________________________________________________________________________________
+
+Wenn ich einfach aus meinem root-Verzeichnis pytest eingebe, bekomme ich folgende Rückmeldung:
+======================================== test session starts ========================================
+platform darwin -- Python 3.12.3, pytest-8.2.2, pluggy-1.5.0
+rootdir: /Users/konrad.thiemann/DA/Kanban-Backend
+plugins: django-4.8.0
+collected 0 items          
+
+Bei der Dokumentation habe ich alle Einstellungen soweit du beschrieben hast umgesetzt.
+Ich habe lediglich nicht das theme installiert, da ich schon 'alabaster' augewählt habe.
+Wenn ich in meinem docs verzeichnis nun make html ausführe bekomme ich folgende Rückmeldung:
+
+Running Sphinx v7.3.7
+loading pickled environment... done
+building [mo]: targets for 0 po files that are out of date
+writing output... 
+building [html]: targets for 0 source files that are out of date
+updating environment: 0 added, 0 changed, 0 removed
+reading sources... 
+looking for now-outdated files... none found
+no targets are out of date.
+build succeeded.
+
+The HTML pages are in build/html.
+
+Allerdings wird mir die html Seite sehr hässlich in plane html und ohne styling angezeigt und 2. ist nichts von meiner Dokumentation vorhanden.
+Was ist der Fehler?
+
+___________________________________________________________________________________________________________________________________________
+
+Wenn ich direkt pytest auf die datei ausführe bekomme ich folgende Rückmeldung:
+ pytest todo/tests.py
+======================================== test session starts ========================================
+platform darwin -- Python 3.12.3, pytest-8.2.2, pluggy-1.5.0
+rootdir: /Users/konrad.thiemann/DA/Kanban-Backend
+plugins: django-4.8.0
+collected 0 items / 1 error                                                                         
+
+============================================== ERRORS ===============================================
+__________________________________ ERROR collecting todo/tests.py ___________________________________
+todo/tests.py:2: in <module>
+    from django.contrib.auth.models import User
+env/lib/python3.12/site-packages/django/contrib/auth/models.py:3: in <module>
+    from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+env/lib/python3.12/site-packages/django/contrib/auth/base_user.py:59: in <module>
+    class AbstractBaseUser(models.Model):
+env/lib/python3.12/site-packages/django/db/models/base.py:129: in __new__
+    app_config = apps.get_containing_app_config(module)
+env/lib/python3.12/site-packages/django/apps/registry.py:260: in get_containing_app_config
+    self.check_apps_ready()
+env/lib/python3.12/site-packages/django/apps/registry.py:137: in check_apps_ready
+    settings.INSTALLED_APPS
+env/lib/python3.12/site-packages/django/conf/__init__.py:89: in __getattr__
+    self._setup(name)
+env/lib/python3.12/site-packages/django/conf/__init__.py:69: in _setup
+    raise ImproperlyConfigured(
+E   django.core.exceptions.ImproperlyConfigured: Requested setting INSTALLED_APPS, but settings are not configured. You must either define the environment variable DJANGO_SETTINGS_MODULE or call settings.configure() before accessing settings.
+====================================== short test summary info ======================================
+ERROR todo/tests.py - django.core.exceptions.ImproperlyConfigured: Requested setting INSTALLED_APPS, but settings are ...
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+========================================= 1 error in 0.30s ==========================================
+

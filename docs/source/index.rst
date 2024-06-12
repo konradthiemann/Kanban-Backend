@@ -10,7 +10,14 @@ Welcome to Kanban Backend's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+.. automodule:: todo.models
+   :members:
 
+.. automodule:: todo.serializers
+   :members:
+
+.. automodule:: todo.views
+   :members:
 
 Indices and tables
 ==================

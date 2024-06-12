@@ -11,6 +11,7 @@ from .filters import TodoFilter, CategoryFilter, UserFilter
 
 """
 API endpoint
+
 """
 class TodoViewSet(viewsets.ModelViewSet):
     queryset = Todo.objects.all().order_by('-id')
@@ -18,7 +19,6 @@ class TodoViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_class = TodoFilter
-
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
