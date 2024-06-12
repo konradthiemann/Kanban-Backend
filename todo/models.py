@@ -15,6 +15,7 @@ class Category(models.Model):
     """
 
     name = models.CharField(max_length=50)
+    description = models.CharField(max_length=255, default='No description provided')
 
     def __str__(self) -> str:
         return self.name
@@ -53,7 +54,8 @@ class Todo(models.Model):
         max_length=30
     )
     description = models.TextField(
-        max_length=500
+        max_length=500,
+        default='no description provided'
     )
     due_date = models.DateTimeField(
         null=True,
