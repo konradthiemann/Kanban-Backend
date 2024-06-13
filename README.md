@@ -110,7 +110,7 @@ Your response will look like this:
 #### How to handle Todos
 
 - To get all todos you need to make a GET request to `/todos/`
-    - You can add filters to the url like this:
+    - You can add filters to the URL like this:
     ```
     /todos/?title=test
     ```
@@ -134,11 +134,13 @@ Your response will look like this:
     "name": "categoryName"
 }
 ``` 
-#### Get list of all Users
-To get a JSON of all users make a GET request to `/users/` like down below:
-```
-
-```
+#### Get list of Users
+- To get a JSON of all users make a GET request to `/users/`. 
+- You can add filters to the URL.
+    - You can filter by `username`, `first_name`, `last_name`, `email`. 
+    ```
+    /users/?username=admin
+    ```
 
 ### API Documentation
 The full API documentation can be found in the generated HTML files. To generate the documentation, run the following commands:

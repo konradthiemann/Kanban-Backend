@@ -34,6 +34,11 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = UserFilter
+    filterset_fields = [
+        'username',
+        'email',
+        'first_name',
+        'last_name'
+        ]
 
     
