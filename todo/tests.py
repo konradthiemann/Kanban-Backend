@@ -13,13 +13,14 @@ class TodoTestCase(TestCase):
         self.todo = Todo.objects.create(
             title='Test Todo',
             description='This is a test todo',
-            due_date='2024-06-30T00:00:00Z',
+            due_date=1718082165,
             urgency='medium',
             status='todo',
             category=self.category,
             author=self.user
         )
         self.todo.assigned_to.set([self.user])
+        self.client = APIClient()
     
     def _get_access_token(self, user):
         access_token = AccessToken.for_user(user)
@@ -43,16 +44,22 @@ class TodoTestCase(TestCase):
         response = self.client.post('/todos/', {
             'title': 'New Todo',
             'description': 'New Todo Description',
-            'due_date': '2024-07-01T00:00:00Z',
+            'due_date': 1718082165,
             'urgency': 'high',
             'status': 'in_progress',
             'category': self.category.id,
             'assigned_to': [self.user.id]
         }, format='json')
+        print(response.data)
         self.assertEqual(response.status_code, 201)
 
     def test_get_todos(self):
+        token = self._get_access_token(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
         response = self.client.get('/todos/')
+        
+        print(response.data)
         self.assertEqual(response.status_code, 200)
 
     # def test_create_todo(self):

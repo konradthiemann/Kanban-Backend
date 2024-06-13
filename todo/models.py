@@ -57,7 +57,7 @@ class Todo(models.Model):
         max_length=500,
         default='no description provided'
     )
-    due_date = models.DateTimeField(
+    due_date = models.IntegerField(
         null=True,
         blank=True
     )
