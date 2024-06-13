@@ -69,19 +69,78 @@ Ensure you configure your Django settings in `kanbanBackend/settings.py`. Pay pa
 
 Here are some of the key endpoints of the Kanban Backend:
 
-- `/api/todos/` - CRUD operations for tasks
-- `/api/categories/` - CRUD operations for categories
-- `/api/users/` - User management
+- `/todos/` - CRUD operations for tasks
+- `/categories/` - CRUD operations for categories
+- `/users/` - User management
+- `/api/token/` - Get Auth Token
+- `/api/token/refresh/` - Refresh Auth Token
 
 ### Example API Requests
 
-#### Create a new task
+#### Get new Auth Token
 
+Make a POST request to `/api/token/` with username and password in the body like this:
+```
+{
+    "username":"username",
+    "password":"password"
+}
+```
+Your response will look like this:
+```
+{
+    "refresh": "refresh token",
+    "access": "access token"
+}
+```
+
+#### Refresh Auth Token
+To refresh the current Auth token make a POST request to `/api/token/refresh/` like down below:
+```
+{
+    "refresh":"refresh token"
+}
+```
+Your response will look like this:
+```
+{
+    "access": "access token"
+}
+```
+#### How to handle Todos
+
+- To get all todos you need to make a GET request to `/todos/`
+    - You can add filters to the url like this:
+    ```
+    /todos/?title=test
+    ```
+- To create a todo you need to make a POST request to `/todos/`
 ```sh
 curl -X POST http://localhost:8000/api/todos/ -d '{"title": "New Task", "description": "Task description"}' -H "Content-Type: application/json"
 ```
 
-### Example API Requests
+
+#### Create a category
+To create a new category make a POST request to `/categories/` like down below:
+```
+{
+    "name":"categoryName"
+}
+```
+Your response will look like this:
+```
+{
+    "id": 1,
+    "name": "categoryName"
+}
+``` 
+#### Get list of all Users
+To get a JSON of all users make a GET request to `/users/` like down below:
+```
+
+```
+
+### API Documentation
 The full API documentation can be found in the generated HTML files. To generate the documentation, run the following commands:
 
 ```sh

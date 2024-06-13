@@ -49,7 +49,15 @@ class TodoSerializer(serializers.ModelSerializer):
         queryset=User.objects.all(),
         many=True,
     )
-    due_date = serializers.IntegerField() 
+    due_date = serializers.IntegerField(
+        required=False,
+        allow_null=True
+    ) 
+    caterory = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(),
+        required=False,
+        allow_null=True
+    )
     class Meta:
         model = Todo
         fields = [
