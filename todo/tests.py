@@ -25,17 +25,6 @@ class TodoTestCase(TestCase):
     def _get_access_token(self, user):
         access_token = AccessToken.for_user(user)
         return str(access_token)
-    
-    # def _get_jwt_token(self, user):
-    #     payload = {
-    #         'username': user.username,
-    #         'email': user.email,
-    #     }
-    #     jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-    #     jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-    #     payload = jwt_payload_handler(user)
-    #     token = jwt_encode_handler(payload)
-    #     return token
 
     def test_todo_creation(self):
         token = self._get_access_token(self.user)
@@ -61,16 +50,3 @@ class TodoTestCase(TestCase):
         
         print(response.data)
         self.assertEqual(response.status_code, 200)
-
-    # def test_create_todo(self):
-    #     self.client.login(username='testuser', password='12345')
-    #     response = self.client.post('/todos/', {
-    #         'title': 'New Todo',
-    #         'description': 'New Todo Description',
-    #         'due_date': '2024-07-01T00:00:00Z',
-    #         'urgency': 'high',
-    #         'status': 'in_progress',
-    #         'category': self.category.id,
-    #         'assigned_to': [self.user.id]
-    #     }, content_type='application/json')
-    #     self.assertEqual(response.status_code, 201)

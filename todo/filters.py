@@ -1,5 +1,6 @@
 import django_filters
-from .models import Todo
+from .models import Todo, Category
+from django.contrib.auth.models import User
 
 class TodoFilter(django_filters.FilterSet):
     
@@ -20,7 +21,7 @@ class CategoryFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains')
     
     class Meta:
-        model = Todo
+        model = Category
         fields = ['name']
 
 class UserFilter(django_filters.FilterSet):
@@ -29,8 +30,9 @@ class UserFilter(django_filters.FilterSet):
     last_name = django_filters.CharFilter(lookup_expr='icontains')
     email = django_filters.CharFilter(lookup_expr='icontains')
     class Meta:
-        model = Todo
+        model = User
         fields = [
+            'id',
             'username',
             'first_name',
             'last_name',

@@ -53,7 +53,7 @@ class TodoSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True
     ) 
-    caterory = serializers.PrimaryKeyRelatedField(
+    category = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(),
         required=False,
         allow_null=True
