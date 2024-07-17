@@ -55,8 +55,6 @@ class TodoSerializer(serializers.ModelSerializer):
     ) 
     category = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(),
-        required=False,
-        allow_null=True
     )
     class Meta:
         model = Todo

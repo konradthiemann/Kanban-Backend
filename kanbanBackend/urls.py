@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.urls import path, include
 from django.contrib import admin
-from todo.views import TodoViewSet, CategoryViewSet, UserViewSet
+from todo.views import TodoViewSet, CategoryViewSet, UserViewSet, search_tasks
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -32,6 +32,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'), # POST JSON with "username" & "password"
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), # POST JSON with "refresh":"refreshToken"
+    path('tasks/search/', search_tasks, name='search_tasks'), # GET with query string "q" /tasks/search/?q=searchString
     path('', include(router.urls)),
     # path('api/auth/', include('rest_framework.urls')), # For login/logout views
 ]

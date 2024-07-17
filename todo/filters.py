@@ -25,6 +25,7 @@ class CategoryFilter(django_filters.FilterSet):
         fields = ['name']
 
 class UserFilter(django_filters.FilterSet):
+    id = django_filters.NumberFilter()
     username = django_filters.CharFilter(lookup_expr='icontains') # icontains: Fallunabhängige Überprüfung, unabhängig von Kein- und Großschreibung
     first_name = django_filters.CharFilter(lookup_expr='icontains')
     last_name = django_filters.CharFilter(lookup_expr='icontains')
