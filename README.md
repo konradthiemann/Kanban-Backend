@@ -72,6 +72,7 @@ Here are some of the key endpoints of the Kanban Backend:
 - `/todos/` - CRUD operations for tasks
 - `/categories/` - CRUD operations for categories
 - `/users/` - User management
+- `/register/` - User registration
 - `/api/token/` - Get Auth Token
 - `/api/token/refresh/` - Refresh Auth Token
 
@@ -134,6 +135,22 @@ Your response will look like this:
     "name": "categoryName"
 }
 ``` 
+#### Create/register a new User
+- To register a new User you need to make a POST request to `/register/`
+```
+{
+    {
+      username: testuser,
+      email: random@email.com,
+      first_name: john,
+      last_name: doe,
+      password: topSecret,
+      confirm_password: topSecret,
+    }
+}
+```
+- If your registration fails you get a response with matching error messages for the field that fails.
+
 #### Get list of Users
 - To get a JSON of all users make a GET request to `/users/`. 
 - You can add filters to the URL.

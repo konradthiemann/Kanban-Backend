@@ -57,36 +57,54 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = UserFilter
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth.models import User
+from rest_framework.permissions import AllowAny
+
 class RegisterUserView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        errors = {}
         username = request.data.get('username')
         first_name = request.data.get('first_name')
         last_name = request.data.get('last_name')
         password = request.data.get('password')
+        confirm_password = request.data.get('confirm_password')
         email = request.data.get('email')
         
-        if not username or not password:
-            return Response({'error': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not username:
+            errors['username'] = ['This field may not be blank.']
+        elif User.objects.filter(username=username).exists():
+            errors['username'] = ['Username is already taken.']
         
-        if User.objects.filter(username=username).exists():
-            return Response({'error': 'Username is already taken'}, status=status.HTTP_400_BAD_REQUEST)
+        if not password:
+            errors['password'] = ['This field may not be blank.']
+        elif len(password) < 8:
+            errors['password'] = ['Password must be at least 8 characters long.']
         
-        if User.objects.filter(email=email).exists():
-            return Response({'error': 'Email is already taken'}, status=status.HTTP_400_BAD_REQUEST)
+        if not first_name:
+            errors['first_name'] = ['This field may not be blank.']
         
-        if len(password) < 8:
-            return Response({'error': 'Password must be at least 8 characters long'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if not first_name or not last_name:
-            return Response({'error': 'First name and last name are required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not last_name:
+            errors['last_name'] = ['This field may not be blank.']
         
         if not email:
-            return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+            errors['email'] = ['This field may not be blank.']
+        elif '@' not in email:
+            errors['email'] = ['Invalid email address.']
+        elif User.objects.filter(email=email).exists():
+            errors['email'] = ['Email is already taken.']
+
+        if not confirm_password:
+            errors['confirm_password'] = ['This field may not be blank.']
+        elif password != confirm_password:
+            errors['confirm_password'] = ['Passwords do not match.']
         
-        if email and '@' not in email:
-            return Response({'error': 'Invalid email address'}, status=status.HTTP_400_BAD_REQUEST)
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
         
         user = User.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name)
         user.save()
